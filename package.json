@@ -1,0 +1,37 @@
+{
+    "name": "online-game",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "watch": "src",
+        "ext": "ts",
+        "dev": "concurrently \"npx tsc --watch\" \"nodemon dist/index.js\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@types/better-sqlite3": "^7.6.12",
+        "bcrypt": "^5.1.1",
+        "better-sqlite3": "^11.8.1",
+        "dgram": "^1.0.1",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "express-session": "^1.18.1",
+        "socket.io": "^4.8.1",
+        "ws": "^8.18.1"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
+        "@types/express": "^5.0.0",
+        "@types/express-session": "^1.18.1",
+        "@types/node": "^22.13.9",
+        "@types/socket.io": "^3.0.1",
+        "@types/ws": "^8.18.0",
+        "concurrently": "^9.1.2",
+        "nodemon": "^3.1.9",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.2"
+    }
+}
