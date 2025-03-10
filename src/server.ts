@@ -1,6 +1,7 @@
 const config = {
     port: { dgram: 2337, app: 80 }, // used for both websocket and app
     rate_limit: 100, // minimum time (ms) between each request per user
+    current_id: 0
 }
 
 import express, { Express, Request, Response } from "express";
@@ -39,9 +40,13 @@ io.on('connection', (socket) => {
         console.log('A user disconnected');
     });
 
-    socket.on('message', (data) => {
-        console.log('Message from client:', data);
-        io.emit('message', data);
+    socket.on('action', (data) => {
+        io.emit('update', data);
+    });
+
+    socket.on('idpls', () => {
+        socket.emit('id', config.current_id);
+        config.current_id++;
     });
 });
 
