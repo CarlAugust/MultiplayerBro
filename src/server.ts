@@ -4,6 +4,8 @@ const config = {
     current_id: 0
 }
 
+import { Color, Player } from "../types/game-types"
+
 import express, { Express, Request, Response } from "express";
 import session from "express-session";
 import path from "path";
@@ -16,7 +18,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 
-// App handling
+// Web server
 
 app.use(session({
     secret: "pretty secret",
@@ -31,22 +33,51 @@ app.use(express.urlencoded({ extended: true })); // To parse urlencoded paramete
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Websocket handling
+// Game server
+
+const players: Map<number, Player> = new Map();
 
 io.on('connection', (socket) => {
-    console.log('A user connected');
-    
+    console.log("Player connected");
+
+    let player: Player = {
+        id: config.current_id,
+        x: 500,
+        y: 500,
+        color: Color.red
+    };
+
+    players.set(config.current_id, player);
+    config.current_id++;
+
+    socket.emit("update", JSON.stringify([...players]));
+
     socket.on('disconnect', () => {
         console.log('A user disconnected');
     });
 
-    socket.on('action', (data) => {
-        io.emit('update', data);
-    });
+    socket.on('move', (data) => {
+        console.log("movement");
+        switch (data)
+        {
+            case "s":
+                player.y += 10;
+                break;
+            case "w":
+                player.y -= 10;
+                break;
+            case "d":
+                player.x += 10;
+                break;
+            case "a":
+                player.x -= 10;
+                break;
+        }
 
-    socket.on('idpls', () => {
-        socket.emit('id', config.current_id);
-        config.current_id++;
+        players.set(player.id, player);
+
+        const serializedPlayers = JSON.stringify([...players]);
+        io.emit('update', serializedPlayers);
     });
 });
 

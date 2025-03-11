@@ -1,81 +1,43 @@
-const socket = io("http://localhost:80");
+const socket = io(`${window.location.host}`);
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-socket.on('id', (data) => {
-    player.id = data;
-});
-
-socket.emit("idpls", "plsid");
-
-const player = {
+let player = {
     id: null,
     x: canvas.width / 2,
-    y: canvas.height / 2
+    y: canvas.height / 2,
+    color: "red"
 };
 
-const playerArray = [player];
+let players = new Map();
 
 let x = canvas.width / 2;
 let y = canvas.height / 2;
 const radius = 10;
-const speed = 10;
 
 function drawOrb() {
-    for (let val of playerArray)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    for (let val of players.values())
     {
-        console.log("Render", val.id);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        console.log("render", val.x, val.y);
         ctx.beginPath();
         ctx.arc(val.x, val.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = val.color;
         ctx.fill();
         ctx.closePath();
     }
 }
 
-function sendData()
-{
-    socket.emit('action', player);
-};
-
 function moveOrb(event) {
-    switch (event.key) {
-        case 'ArrowUp':
-            player.y -= speed;
-            break;
-        case 'ArrowDown':
-            player.y += speed;
-            break;
-        case 'ArrowLeft':
-            player.x -= speed;
-            break;
-        case 'ArrowRight':
-            player.x += speed;
-            break;
-    }
+    socket.emit("move", event.key);
     drawOrb();
-    sendData();
 }
 
 socket.on('update', (data) => {
-    let newPlayer = true;
-    for (let val in playerArray)
-    {
-        if (playerArray[val].id == data.id)
-        {
-            newPlayer = false;
-            playerArray[val].x = data.x;
-            playerArray[val].y = data.y;
-            break;
-        }
-    }
-
-    if (newPlayer)
-    {
-        playerArray.push(data);
-    }
+    players = new Map(JSON.parse(data));
+    drawOrb();
 });
 
 window.addEventListener('keydown', moveOrb);
