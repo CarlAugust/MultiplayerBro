@@ -21,7 +21,6 @@ function drawOrb() {
     
     for (let val of players.values())
     {
-        console.log("render", val.x, val.y);
         ctx.beginPath();
         ctx.arc(val.x, val.y, radius, 0, Math.PI * 2);
         ctx.fillStyle = val.color;
@@ -31,15 +30,35 @@ function drawOrb() {
 }
 
 function moveOrb(event) {
-    socket.emit("move", event.key);
+    socket.emit("move", {x:event.x, y:event.y});
     drawOrb();
 }
 
-socket.on('update', (data) => {
-    players = new Map(JSON.parse(data));
+
+function main()
+{
+    window.addEventListener('mousemove', moveOrb);
     drawOrb();
+}
+
+socket.on('init', (data) => {
+    players = new Map(JSON.parse(data));
+    main();
 });
 
-window.addEventListener('keydown', moveOrb);
-drawOrb();
+socket.on('update', (data) => {
+    const updatingPlayer = players.get(data.id);
+    if (updatingPlayer != undefined)
+    {
+        console.log(updatingPlayer);
+        updatingPlayer.x = data.x;
+        updatingPlayer.y = data.y;
+    }
+    else
+    {
+        players.set(data.id, data);
+    }
+
+    drawOrb();
+});
 

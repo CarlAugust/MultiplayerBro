@@ -47,37 +47,40 @@ io.on('connection', (socket) => {
         color: Color.red
     };
 
-    players.set(config.current_id, player);
+    players.set(player.id, player);
     config.current_id++;
 
-    socket.emit("update", JSON.stringify([...players]));
+    socket.emit("init", JSON.stringify([...players]));
 
     socket.on('disconnect', () => {
         console.log('A user disconnected');
     });
 
     socket.on('move', (data) => {
-        console.log("movement");
-        switch (data)
+
+        const updatingPlayer = players.get(player.id);
+        if (updatingPlayer)
         {
-            case "s":
-                player.y += 10;
-                break;
-            case "w":
-                player.y -= 10;
-                break;
-            case "d":
-                player.x += 10;
-                break;
-            case "a":
-                player.x -= 10;
-                break;
+            // switch (data)
+            // {
+            //     case "s":
+            //         updatingPlayer.y += 10;
+            //         break;
+            //     case "w":
+            //         updatingPlayer.y -= 10;
+            //         break;
+            //     case "d":
+            //         updatingPlayer.x += 10;
+            //         break;
+            //     case "a":
+            //         updatingPlayer.x -= 10;
+            //         break;
+            // }
+            updatingPlayer.x = data.x;
+            updatingPlayer.y = data.y;
+
+            io.emit('update', updatingPlayer);
         }
-
-        players.set(player.id, player);
-
-        const serializedPlayers = JSON.stringify([...players]);
-        io.emit('update', serializedPlayers);
     });
 });
 
