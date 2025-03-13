@@ -59,25 +59,29 @@ io.on('connection', (socket) => {
     socket.on('move', (data) => {
 
         const updatingPlayer = players.get(player.id);
-        if (updatingPlayer)
+
+        if (updatingPlayer == undefined)
         {
-            // switch (data)
-            // {
-            //     case "s":
-            //         updatingPlayer.y += 10;
-            //         break;
-            //     case "w":
-            //         updatingPlayer.y -= 10;
-            //         break;
-            //     case "d":
-            //         updatingPlayer.x += 10;
-            //         break;
-            //     case "a":
-            //         updatingPlayer.x -= 10;
-            //         break;
-            // }
-            updatingPlayer.x = data.x;
-            updatingPlayer.y = data.y;
+            return;
+        }
+
+        for (let key of data)
+        {
+            switch (key)
+            {
+                case "s":
+                    updatingPlayer.y += 10;
+                    break;
+                case "w":
+                    updatingPlayer.y -= 10;
+                    break;
+                case "d":
+                    updatingPlayer.x += 10;
+                    break;
+                case "a":
+                    updatingPlayer.x -= 10;
+                    break;
+            }
 
             io.emit('update', updatingPlayer);
         }

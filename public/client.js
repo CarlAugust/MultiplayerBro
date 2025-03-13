@@ -29,15 +29,27 @@ function drawOrb() {
     }
 }
 
-function moveOrb(event) {
-    socket.emit("move", {x:event.x, y:event.y});
+function moveOrb() {
+    socket.emit("move", Array.from(downKeys));
     drawOrb();
 }
 
+const downKeys = new Set();
+const validKeys = ['w', 's', 'a', 'd'];
 
 function main()
 {
-    window.addEventListener('mousemove', moveOrb);
+    window.addEventListener('keydown', (event) => {
+        if (validKeys.includes(event.key))
+        {
+            downKeys.add(event.key);
+            moveOrb();
+        }
+    });
+    window.addEventListener('keyup', (event) => {
+        downKeys.delete(event.key);
+        moveOrb();
+    })
     drawOrb();
 }
 
